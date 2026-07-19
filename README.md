@@ -6,8 +6,9 @@ an emscripten virtual-filesystem bundle.
 
 ## What it does
 
-1. Builds em-dosbox (github.com/pheller/em-dosbox, branch
-   `prodigy-reloaded-changes`) under emscripten with SDL2 and SDL2_net,
+1. Builds em-dosbox (github.com/ProdigyReloaded/em-dosbox, branch
+   `prodigy-reloaded-changes`, pinned by SHA in the Dockerfile) under
+   emscripten with SDL2 and SDL2_net,
    linking `websocket-config.js` as a pre-js so the emulated serial/modem
    path speaks WebSocket to the delivery-system TCS bridge.
 2. Packages a mounted directory of DOS files with em-dosbox's
@@ -46,6 +47,7 @@ Dropped into the mounted directory:
 ## Licensing
 
 DOSBox and em-dosbox are GPL-2.0; their sources are fetched at image
-build time from the fork named above. Complete corresponding source for
-any distributed `dosbox.js`/`dosbox.wasm` build is available from that
-fork and this repository.
+build time from the ProdigyReloaded/em-dosbox fork at the SHA pinned in
+the Dockerfile. Complete corresponding source for any distributed
+`dosbox.js`/`dosbox.wasm` build is available from that fork and this
+repository.
