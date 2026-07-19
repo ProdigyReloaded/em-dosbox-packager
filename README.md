@@ -1,4 +1,4 @@
-# dosbox-wasm
+# em-dosbox-packager
 
 Docker build harness that produces the in-browser DOSBox runtime used by
 Prodigy Reloaded, plus a packager that turns a directory of DOS files into
