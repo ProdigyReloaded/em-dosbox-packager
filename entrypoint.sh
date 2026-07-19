@@ -42,6 +42,12 @@ python ./packager.py "$OUTPUT_NAME" "$TEMP_DIR" "$FILE_TO_RUN"
 # Move the output files to the mounted volume
 mv "${OUTPUT_NAME}.data" "${OUTPUT_NAME}.html" /dosbox/ 2>/dev/null || true
 
+# Extract the inline Module data-loader from the generated html as loader.js
+# for pages (like the portal /start page) that supply their own html. The
+# loader block is the only flush-left script tag in the generated page.
+awk '/^<script type="text\/javascript">$/{f=1;next} /^<\/script>$/{f=0} f' \
+  "/dosbox/${OUTPUT_NAME}.html" > /dosbox/loader.js || true
+
 # Copy the emscripten runtime files (these should be referenced, not packaged)
 cp dosbox.js dosbox.wasm /dosbox/ 2>/dev/null || true
 
@@ -51,6 +57,7 @@ rm -rf "$TEMP_DIR"
 echo "Packaging complete. Files created in /dosbox:"
 echo "  ${OUTPUT_NAME}.html - Main HTML file"
 echo "  ${OUTPUT_NAME}.data - Packaged DOS application data"
+echo "  loader.js - Module data-loader extracted from the html"
 echo "  dosbox.js - Emscripten JavaScript runtime"
 echo "  dosbox.wasm - Emscripten WebAssembly runtime"
-ls -lh /dosbox/"${OUTPUT_NAME}".* /dosbox/dosbox.js /dosbox/dosbox.wasm 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+ls -lh /dosbox/"${OUTPUT_NAME}".* /dosbox/loader.js /dosbox/dosbox.js /dosbox/dosbox.wasm 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'

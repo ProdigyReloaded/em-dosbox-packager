@@ -34,8 +34,10 @@ Dropped into the mounted directory:
 
 - `dosbox.js`, `dosbox.wasm` - the emulator runtime
 - `<OUTPUT_NAME>.data` - the packed virtual filesystem
-- `<OUTPUT_NAME>.html` - a generated standalone page. The inline Module
-  data-loader script inside it is what the portal uses as `loader.js`.
+- `<OUTPUT_NAME>.html` - a generated standalone page
+- `loader.js` - the Module data-loader extracted from the generated
+  page, for sites (like the portal `/start` page) that supply their own
+  html
 
 ## Consumers
 
