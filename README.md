@@ -44,6 +44,17 @@ Dropped into the mounted directory:
 `loader.js`, `rs-<version>.data`, alongside the portal's own hand-written
 `init.js` glue).
 
+## Automation
+
+Pushing a `v*` tag builds the image with the pinned emsdk and em-dosbox
+versions, pushes it to `ghcr.io/prodigyreloaded/em-dosbox-packager`
+(`:<tag>` and `:latest`), and attaches `dosbox.js`/`dosbox.wasm` to a
+GitHub Release. `workflow_dispatch` builds and pushes a `sha-*` image
+without a release. Local packaging can pull the GHCR image instead of
+building it (the wrapper script builds locally only when the
+`em-dosbox-packager` image is absent; `docker pull` + `docker tag` the
+GHCR image to that name to reuse it).
+
 ## Licensing
 
 DOSBox and em-dosbox are GPL-2.0; their sources are fetched at image

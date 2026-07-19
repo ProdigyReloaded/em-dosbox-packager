@@ -1,6 +1,10 @@
 # vim: set ts=2 sw=2 noai et:
 
-FROM emscripten/emsdk
+# emsdk pinned to the version recorded in the producers section of the
+# shipped dosbox.wasm; bump deliberately, since emscripten upgrades can
+# change codegen for this old em-dosbox tree.
+FROM emscripten/emsdk:4.0.13
+LABEL org.opencontainers.image.source=https://github.com/ProdigyReloaded/em-dosbox-packager
 RUN apt-get update && apt-get install -y autoconf automake python-is-python3
 
 # Pinned commit of ProdigyReloaded/em-dosbox (branch prodigy-reloaded-changes).

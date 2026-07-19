@@ -1,0 +1,80 @@
+# Builds the packager image (emsdk + compiled em-dosbox), pushes it to
+# GHCR, and on version tags attaches the runtime artifacts (dosbox.js,
+# dosbox.wasm) to a GitHub Release.
+#
+# Triggers:
+#   - push of a v* tag: image pushed as :<tag> and :latest, release created
+#   - workflow_dispatch: image pushed as :sha-<short>, no release
+
+name: build-and-release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  IMAGE: ghcr.io/prodigyreloaded/em-dosbox-packager
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine image tag
+        id: meta
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build image
+        run: docker build --platform linux/amd64 -t "$IMAGE:${{ steps.meta.outputs.tag }}" .
+
+      - name: Push image
+        run: |
+          docker push "$IMAGE:${{ steps.meta.outputs.tag }}"
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            docker tag "$IMAGE:${{ steps.meta.outputs.tag }}" "$IMAGE:latest"
+            docker push "$IMAGE:latest"
+          fi
+
+      - name: Extract runtime artifacts
+        run: |
+          cid=$(docker create "$IMAGE:${{ steps.meta.outputs.tag }}")
+          mkdir -p artifacts
+          docker cp "$cid:/src/em-dosbox/src/dosbox.js" artifacts/
+          docker cp "$cid:/src/em-dosbox/src/dosbox.wasm" artifacts/
+          docker rm "$cid"
+          ls -lh artifacts/
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dosbox-runtime-${{ steps.meta.outputs.tag }}
+          path: artifacts/
+
+      - name: Create release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --notes "DOSBox wasm runtime built from the em-dosbox commit and emsdk version pinned in this tag's Dockerfile. Corresponding source: see EM_DOSBOX_SHA in the Dockerfile." \
+            artifacts/dosbox.js artifacts/dosbox.wasm
