@@ -24,6 +24,12 @@ RUN cd /src/em-dosbox \
     CXXFLAGS="-O3 -g -s USE_SDL=2 -s USE_SDL_NET=2" \
     LDFLAGS="--pre-js websocket-config.js -s WEBSOCKET_SUBPROTOCOL=null" \
   && make
+# Keep the raw debug build as dosbox-debug.wasm; ship the stripped one.
+# llvm-strip --strip-all reproduces the historically shipped dosbox.wasm
+# byte-for-byte (2.9M vs 15.8M raw).
+RUN cd /src/em-dosbox/src \
+  && cp dosbox.wasm dosbox-debug.wasm \
+  && /emsdk/upstream/bin/llvm-strip --strip-all dosbox.wasm
 RUN cd /src/em-dosbox/src && cp dosbox.html template.html
 
 COPY entrypoint.sh /entrypoint.sh

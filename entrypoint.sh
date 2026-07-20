@@ -29,6 +29,7 @@ cd /dosbox
 for file in *; do
     # Skip the emscripten output files and previously generated packages
     if [[ "$file" != "dosbox.js" && "$file" != "dosbox.wasm" && \
+          "$file" != "dosbox-debug.wasm" && "$file" != "loader.js" && \
           "$file" != *.html && "$file" != *.data ]]; then
         cp -r "$file" "$TEMP_DIR/"
     fi
