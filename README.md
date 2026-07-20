@@ -59,8 +59,14 @@ GHCR image to that name to reuse it).
 
 ## Licensing
 
-DOSBox and em-dosbox are GPL-2.0; their sources are fetched at image
-build time from the ProdigyReloaded/em-dosbox fork at the SHA pinned in
-the Dockerfile. Complete corresponding source for any distributed
-`dosbox.js`/`dosbox.wasm` build is available from that fork and this
+This repository's own files (the Dockerfile, the shell scripts, and
+`websocket-config.js`) are licensed AGPL-3.0-or-later; see `LICENSE`.
+
+DOSBox and em-dosbox are GPL-2.0-or-later; their sources are fetched at
+image build time from the ProdigyReloaded/em-dosbox fork at the SHA
+pinned in the Dockerfile. `websocket-config.js` is linked into the
+DOSBox build as a pre-js, so the resulting `dosbox.js`/`dosbox.wasm`
+combine AGPL-3.0 and GPL-2.0-or-later code (GPL-2.0-or-later upgrades to
+GPL-3.0, with which AGPL-3.0 is compatible). Complete corresponding
+source for any distributed build is available from that fork and this
 repository.
