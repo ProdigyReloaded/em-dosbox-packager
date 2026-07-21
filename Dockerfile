@@ -30,14 +30,14 @@ RUN git init /src/em-dosbox \
   && git -C /src/em-dosbox remote add origin "$EM_DOSBOX_REPO" \
   && git -C /src/em-dosbox fetch --depth 1 origin "$EM_DOSBOX_SHA" \
   && git -C /src/em-dosbox checkout FETCH_HEAD
-COPY websocket-config.js /src/em-dosbox
-COPY websocket-config.js /src/em-dosbox/src
+COPY websocket-config.js expose-runtime.js /src/em-dosbox/
+COPY websocket-config.js expose-runtime.js /src/em-dosbox/src/
 RUN cd /src/em-dosbox \
   && sh ./autogen.sh \
   && emconfigure ./configure \
     CFLAGS="-O3 -g -s USE_SDL=2 -s USE_SDL_NET=2" \
     CXXFLAGS="-O3 -g -s USE_SDL=2 -s USE_SDL_NET=2" \
-    LDFLAGS="--pre-js websocket-config.js -s WEBSOCKET_SUBPROTOCOL=null" \
+    LDFLAGS="--pre-js websocket-config.js --pre-js expose-runtime.js -s WEBSOCKET_SUBPROTOCOL=null -lidbfs.js" \
   && make
 # Keep the raw debug build as dosbox-debug.wasm; ship the stripped one.
 # llvm-strip --strip-all reproduces the historically shipped dosbox.wasm

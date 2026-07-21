@@ -8,9 +8,14 @@ an emscripten virtual-filesystem bundle.
 
 1. Builds em-dosbox (github.com/ProdigyReloaded/em-dosbox, branch
    `prodigy-reloaded-changes`, pinned by SHA in the Dockerfile) under
-   emscripten with SDL2 and SDL2_net,
-   linking `websocket-config.js` as a pre-js so the emulated serial/modem
-   path speaks WebSocket to the delivery-system TCS bridge.
+   emscripten with SDL2 and SDL2_net, IDBFS (`-lidbfs.js`), and two
+   pre-js files:
+   - `websocket-config.js` — points the emulated serial/modem path at the
+     delivery-system TCS bridge over WebSocket.
+   - `expose-runtime.js` — puts the emscripten `FS` and `IDBFS` objects on
+     `Module` (deferred via a `preRun` so they are defined by the time it
+     runs) so the host page can mount IndexedDB-backed persistent storage
+     over the client's drive. Harmless when the page doesn't use it.
 2. Packages a mounted directory of DOS files with em-dosbox's
    `packager.py` into a loadable data bundle.
 
